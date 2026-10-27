@@ -17,7 +17,7 @@ textarea{min-height:88px;resize:vertical}input:focus,textarea:focus{outline:2px 
 .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.choice{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--line);border-radius:13px;background:#fff;cursor:pointer;min-height:52px;font-weight:400}
 .choice:has(input:checked){background:var(--soft);border-color:var(--accent)}.choice input{margin-top:5px;accent-color:#6d4b3e;flex:0 0 auto}.choice strong{display:block}.choice small{display:block;color:var(--muted);font-size:.84rem}
 .subfield{margin-top:14px}.note{background:#f8f0e9;border-radius:12px;padding:12px 14px;color:var(--muted);font-size:.88rem;margin-top:16px}
-button{width:100%;border:0;border-radius:13px;padding:15px 18px;margin-top:18px;background:#287b51;color:#fff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}button:hover{background:#206a44}.privacy,.footer{text-align:center;color:var(--muted);font-size:.83rem;margin:12px 5px 0}.footer{margin-top:20px}
+button{width:100%;border:0;border-radius:13px;padding:15px 18px;margin-top:18px;background:#287b51;color:#fff;font:700 1rem inherit;cursor:pointer}button:hover{background:#206a44}.privacy,.footer{text-align:center;color:var(--muted);font-size:.83rem;margin:12px 5px 0}.footer{margin-top:20px}
 @media(max-width:520px){body{padding:14px 9px 28px}.fields,.choices{grid-template-columns:1fr}form{border-radius:17px}}
 </style></head>
 <body><main class="wrap">
@@ -57,42 +57,18 @@ button{width:100%;border:0;border-radius:13px;padding:15px 18px;margin-top:18px;
 </form><footer class="footer">Com carinho, <em>studioby.malu</em> 🤍</footer>
 </main>
 <script>
-(function () {
-  var form = document.getElementById('preAtendimento');
-  var phoneNumber = '5519998767539';
-  function field(name) {
-    var elements = form.elements[name];
-    if (!elements) return '';
-    if (elements.length && !elements.tagName) {
-      for (var i = 0; i < elements.length; i++) {
-        if (elements[i].checked) return elements[i].value;
-      }
-      return '';
-    }
-    if (elements.type === 'checkbox') return elements.checked ? 'Sim' : 'Não';
-    return elements.value || '';
-  }
-  form.addEventListener('submit', function (event) {
-    event.preventDefault();
-    if (form.checkValidity && !form.checkValidity()) {
-      if (form.reportValidity) form.reportValidity();
-      return;
-    }
-    var nome = field('nome').trim();
-    var rawDate = field('dia');
-    var parts = rawDate.split('-');
-    var dia = parts.length === 3 ? parts[2] + '/' + parts[1] + '/' + parts[0] : rawDate;
-    var horario = field('horario');
-    var mensagem = 'Olá, @studioby.malu! 🤍\n\n' +
-      'Meu nome é *' + nome + '*. Gostaria de ser atendida no dia *' + dia + '*, às *' + horario + '*, dessa maneira:\n\n' +
-      '✨ AROMA ESCOLHIDO\n' + field('aroma') + '\n\n' +
-      '☕ COMO GOSTARIA DE SER RECEBIDA\n' + field('recepcao') + '\n' +
-      '🍊 Acrescentar laranja desidratada ao chá: ' + field('laranjaCha') + '\n\n' +
-      '🍪 ACEITO O PETISCO DO DIA\n' + field('petisco') + '\n\n' +
-      'Não gosto do sabor ou doce:\n' + (field('naoGosta').trim() || 'Não informado') + '\n\n' +
-      '🤍 CORTESIA ESCOLHIDA\n' + field('cortesia');
-    var url = 'https://api.whatsapp.com/send?phone=' + phoneNumber + '&text=' + encodeURIComponent(mensagem);
-    window.location.assign(url);
-  });
-}());
+const form=document.getElementById('preAtendimento');
+const phoneNumber='5519998767539';
+form.addEventListener('submit',function(event){
+ event.preventDefault(); if(!form.reportValidity()) return;
+ const d=new FormData(form), nome=(d.get('nome')||'').trim();
+ const partes=(d.get('dia')||'').split('-');
+ const dia=partes.length===3?`${partes[2]}/${partes[1]}/${partes[0]}`:(d.get('dia')||'');
+ const horario=d.get('horario')||'', aroma=d.get('aroma')||'Não informado';
+ const recepcao=d.get('recepcao')||'Não informado', laranja=d.get('laranjaCha')?'Sim':'Não';
+ const petisco=d.get('petisco')||'Não informado', sabores=(d.get('naoGosta')||'').trim()||'Não informado';
+ const cortesia=d.get('cortesia')||'Não informado';
+ const mensagem=`Olá, @studioby.malu! 🤍\n\nMeu nome é *${nome}*. Gostaria de ser atendida no dia *${dia}*, às *${horario}*, dessa maneira:\n\n✨ AROMA ESCOLHIDO\n${aroma}\n\n☕ COMO GOSTARIA DE SER RECEBIDA\n${recepcao}\n🍊 Acrescentar laranja desidratada ao chá: ${laranja}\n\n🍪 ACEITO O PETISCO DO DIA\n${petisco}\n\nNão gosto do sabor ou doce:\n${sabores}\n\n🤍 CORTESIA ESCOLHIDA\n${cortesia}`;
+ window.location.href=`https://wa.me/${phoneNumber}?text=${encodeURIComponent(mensagem)}`;
+});
 </script></body></html>
